@@ -1,0 +1,48 @@
+input:
+  dim: 3
+  size: 227
+conv1:
+  out: 96
+  k: 7
+  s: 2
+  p: 0
+pool1:
+  k: 2
+  s: 2
+  p: 0
+conv2:
+  out: 384
+  k: 5
+  s: 2
+  p: 0
+pool2:
+  k: 2
+  s: 2
+  p: 0
+conv3:
+  out: 512
+  k: 5
+  s: 1
+  p: 2
+conv4:
+  out: 512
+  k: 5
+  s: 1
+  p: 2
+conv5:
+  out: 384
+  k: 5
+  s: 1
+  p: 2
+conv6:
+  out:
+    dim: 384
+    size: 6
+  k: 7
+  s: 2
+  p: 2
+lstm:
+  in: 4096
+  hidden: 256
+output:
+  size: 2
