@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import torch
 import torch.nn as nn
 from tqdm import tqdm
@@ -11,6 +12,7 @@ from collections import OrderedDict
 from net.Net import Net
 from net.LSTM import LSTM
 import yaml
+import imageio
 
 
 def train(train_loader, model, optimizer, criterion, device):
@@ -159,3 +161,14 @@ def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_
     print('\nFinished.')
     # writer.flush()
     # writer.close()
+
+
+def run_test(model, dataloader_test, save_images):
+    with torch.no_grad():
+        model.eval()
+        for image_num, img in enumerate(dataloader_test):
+            print(image_num, img)
+            # inputs = img.to(next(model.parameters()).device)
+            # pred = model(img)
+            # for i in range(len(image_num)):
+            #     print("gt: {}, pred: {}".format(image_num[i], pred[i]))
