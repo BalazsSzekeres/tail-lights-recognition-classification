@@ -1,3 +1,7 @@
+from typing import List
+
+import numpy as np
+import torch
 import torch.nn as nn
 
 
@@ -83,3 +87,8 @@ class Net(nn.Module):
         # "Given a test frame, instead of taking average among the output predictions, we take the
         # prediction of the last frame as the label for the entire input sequence."
         return y[-1]
+
+    def forward_sequence_list(self, x_list: List[torch.Tensor]):
+        """Forward a list of sequences"""
+        y = torch.stack([self.forward(x) for x in x_list])
+        return y

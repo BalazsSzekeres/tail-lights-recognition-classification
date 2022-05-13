@@ -27,6 +27,10 @@ config = yaml.load(open(config_file), Loader=yaml.FullLoader)
 net = Net(config).to(device)
 summary(net.model['cnn'], (config["input"]["dim"], config["input"]["size"], config["input"]["size"]))
 
-with torch.no_grad():
-    y = net(input)
-    print(y)
+# Example usage
+y_list = net.forward_sequence_list([input, input])
+y1 = net(input)
+y2 = net(input)
+print(y1)
+print(y2)
+print(y_list)
