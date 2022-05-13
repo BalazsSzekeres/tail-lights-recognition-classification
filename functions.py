@@ -1,4 +1,16 @@
+import os
 import torch
+import torch.nn as nn
+from tqdm import tqdm
+import torch.optim as optim
+from collections import OrderedDict
+# Additional Setup to use Tensorboard
+# !pip install -q tensorflow
+# %load_ext tensorboard
+# from torch.utils.tensorboard import SummaryWriter
+from net.Net import Net
+from net.LSTM import LSTM
+import yaml
 
 
 def train(train_loader, model, optimizer, criterion, device):
@@ -10,8 +22,9 @@ def train(train_loader, model, optimizer, criterion, device):
         model: Neural network model.
         optimizer: Optimizer (e.g. SGD).
         criterion: Loss function (e.g. cross-entropy loss).
+        device: Running device (e.g. cuda or cpu)
     """
-  
+
     avg_loss = 0
     correct = 0
     total = 0
@@ -41,6 +54,7 @@ def train(train_loader, model, optimizer, criterion, device):
 
     return avg_loss / len(train_loader), 100 * correct / total
 
+
 def test(test_loader, model, criterion, device):
     """
     Evaluates network in batches.
@@ -54,7 +68,7 @@ def test(test_loader, model, criterion, device):
     avg_loss = 0
     correct = 0
     total = 0
-    
+
     # Use torch.no_grad to skip gradient calculation, not needed for evaluation
     with torch.no_grad():
         # Iterate through batches
@@ -77,30 +91,36 @@ def test(test_loader, model, criterion, device):
 
     return avg_loss / len(test_loader), 100 * correct / total
 
-def run(rnn_type, epochs=100, hidden_size=10):
+
+def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_size=10):
     """
     Run a test on MNIST-1D
 
     Args:
+        weights_location: location for saving weights
+        trainloader: training data
+        testloader: test data
         rnn_type: lstm
         epochs: number of epochs to run
         hidden_size: dimension of hidden state of rnn cell
     """
     # Create a writer to write to Tensorboard
-    writer = SummaryWriter()
+    # writer = SummaryWriter()
 
     if rnn_type == 'lstm':
         rnn = LSTM(1, hidden_size)
+        # Create classifier model
+        model = nn.Sequential(OrderedDict([
+            ('reshape', nn.Unflatten(1, (40, 1))),
+            ('rnn', rnn),
+            ('flat', nn.Flatten()),
+            ('classifier', nn.Linear(40 * hidden_size, 10))
+        ]))
     else:
-        raise Error('Unknown RNN type: ' + rnn_type)
+        config_file = "config/net.yaml"
+        config = yaml.load(open(config_file), Loader=yaml.FullLoader)
 
-    # Create classifier model
-    model = nn.Sequential(OrderedDict([
-        ('reshape', nn.Unflatten(1, (40, 1))),
-        ('rnn', rnn),
-        ('flat', nn.Flatten()),
-        ('classifier', nn.Linear(40 * hidden_size, 10))
-    ]))
+        model = Net(config)
 
     # Create loss function and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -113,29 +133,29 @@ def run(rnn_type, epochs=100, hidden_size=10):
 
     for epoch in tqdm(range(epochs)):
         # Train on data
-        train_loss, train_acc = train(train_loader,
+        train_loss, train_acc = train(trainloader,
                                       model,
                                       optimizer,
                                       criterion,
                                       device)
 
         # Test on data
-        test_loss, test_acc = test(test_loader,
+        test_loss, test_acc = test(testloader,
                                    model,
                                    criterion,
                                    device)
 
         # Write metrics to Tensorboard
-        writer.add_scalars('Loss', {
-            'Train_{}'.format(rnn_type): train_loss,
-            'Test_{}'.format(rnn_type): test_loss
-        }, epoch)
-        writer.add_scalars('Accuracy', {
-            'Train_{}'.format(rnn_type): train_acc,
-            'Test_{}'.format(rnn_type): test_acc
-        }, epoch)
+        # writer.add_scalars('Loss', {
+        #     'Train_{}'.format(rnn_type): train_loss,
+        #     'Test_{}'.format(rnn_type): test_loss
+        # }, epoch)
+        # writer.add_scalars('Accuracy', {
+        #     'Train_{}'.format(rnn_type): train_acc,
+        #     'Test_{}'.format(rnn_type): test_acc
+        # }, epoch)
 
-
+    torch.save({'model': model.state_dict()}, os.path.join(weights_location, 'weights_{}'.format(epochs)))
     print('\nFinished.')
-    writer.flush()
-    writer.close()
+    # writer.flush()
+    # writer.close()

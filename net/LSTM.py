@@ -1,4 +1,7 @@
+import torch
 import torch.nn as nn
+import math
+
 
 class LSTM(nn.Module):
     """
@@ -10,6 +13,7 @@ class LSTM(nn.Module):
         ct ​= ft​ ⊙ c(t−1) ​+ it ​⊙ gt​
         ht ​= ot​ ⊙ tanh(ct​)​
     """
+
     def __init__(self, input_size, hidden_size):
         super(LSTM, self).__init__()
 
@@ -34,10 +38,10 @@ class LSTM(nn.Module):
         ########################################################################
 
         # LSTM parameters
-        self.weight_xh = nn.Parameter(torch.Tensor(input_size, 4*hidden_size))
-        self.weight_hh = nn.Parameter(torch.Tensor(hidden_size, 4*hidden_size))
-        self.bias_xh = nn.Parameter(torch.Tensor(4*hidden_size))
-        self.bias_hh = nn.Parameter(torch.Tensor(4*hidden_size))
+        self.weight_xh = nn.Parameter(torch.Tensor(input_size, 4 * hidden_size))
+        self.weight_hh = nn.Parameter(torch.Tensor(hidden_size, 4 * hidden_size))
+        self.bias_xh = nn.Parameter(torch.Tensor(4 * hidden_size))
+        self.bias_hh = nn.Parameter(torch.Tensor(4 * hidden_size))
 
         ########################################################################
         #                         END OF YOUR CODE                             #
@@ -45,7 +49,6 @@ class LSTM(nn.Module):
 
         # Initialize parameters
         self.reset_params()
-
 
     def reset_params(self):
         """
@@ -57,7 +60,6 @@ class LSTM(nn.Module):
         self.weight_hh.data.uniform_(-std, std)
         self.bias_xh.data.uniform_(-std, std)
         self.bias_hh.data.uniform_(-std, std)
-
 
     def forward(self, x):
         """
@@ -81,7 +83,7 @@ class LSTM(nn.Module):
         # and cell state for each input, so they will have shape of (N, H)
         h0 = torch.zeros(N, H, device=x.device)
         c0 = torch.zeros(N, H, device=x.device)
-        
+
         # Define a list to store outputs. We will then stack them.
         y = []
 
@@ -93,12 +95,12 @@ class LSTM(nn.Module):
         ct_1 = c0
         for t in range(T):
             # LSTM update rule
-            xh = torch.addmm(self.bias_xh, x[t], self.weight_xh) 
+            xh = torch.addmm(self.bias_xh, x[t], self.weight_xh)
             hh = torch.addmm(self.bias_hh, ht_1, self.weight_hh)
             it = torch.sigmoid(xh[:, 0:H] + hh[:, 0:H])
-            ft = torch.sigmoid(xh[:, H:2*H] + hh[:, H:2*H])
-            gt = torch.tanh(xh[:, 2*H:3*H] + hh[:, 2*H:3*H])
-            ot = torch.sigmoid(xh[:, 3*H:4*H] + hh[:, 3*H:4*H])
+            ft = torch.sigmoid(xh[:, H:2 * H] + hh[:, H:2 * H])
+            gt = torch.tanh(xh[:, 2 * H:3 * H] + hh[:, 2 * H:3 * H])
+            ot = torch.sigmoid(xh[:, 3 * H:4 * H] + hh[:, 3 * H:4 * H])
             ct = ft * ct_1 + it * gt
             ht = ot * torch.tanh(ct)
 
@@ -112,7 +114,7 @@ class LSTM(nn.Module):
         ########################################################################
         #                         END OF YOUR CODE                             #
         ########################################################################
-        
+
         # Stack the outputs. After this operation, output will have shape of
         # (T, N, H)
         y = torch.stack(y)
