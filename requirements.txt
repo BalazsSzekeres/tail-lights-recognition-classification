@@ -5,3 +5,4 @@ pyyaml
 numpy
 tqdm
 wandb
+opencv-python
