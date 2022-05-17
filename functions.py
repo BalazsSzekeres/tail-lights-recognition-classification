@@ -8,7 +8,7 @@ from collections import OrderedDict
 # Additional Setup to use Tensorboard
 # !pip install -q tensorflow
 # %load_ext tensorboard
-# from torch.utils.tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from net.Net import Net
 from net.LSTM import LSTM
 import yaml
@@ -107,7 +107,7 @@ def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_
         hidden_size: dimension of hidden state of rnn cell
     """
     # Create a writer to write to Tensorboard
-    # writer = SummaryWriter()
+    writer = SummaryWriter()
 
     if rnn_type == 'lstm':
         rnn = LSTM(1, hidden_size)
@@ -148,19 +148,19 @@ def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_
                                    device)
 
         # Write metrics to Tensorboard
-        # writer.add_scalars('Loss', {
-        #     'Train_{}'.format(rnn_type): train_loss,
-        #     'Test_{}'.format(rnn_type): test_loss
-        # }, epoch)
-        # writer.add_scalars('Accuracy', {
-        #     'Train_{}'.format(rnn_type): train_acc,
-        #     'Test_{}'.format(rnn_type): test_acc
-        # }, epoch)
+        writer.add_scalars('Loss', {
+            'Train_{}'.format(rnn_type): train_loss,
+            'Test_{}'.format(rnn_type): test_loss
+        }, epoch)
+        writer.add_scalars('Accuracy', {
+            'Train_{}'.format(rnn_type): train_acc,
+            'Test_{}'.format(rnn_type): test_acc
+        }, epoch)
 
     torch.save({'model': model.state_dict()}, os.path.join(weights_location, 'weights_{}'.format(epochs)))
     print('\nFinished.')
-    # writer.flush()
-    # writer.close()
+    writer.flush()
+    writer.close()
 
 
 def run_test(model, dataloader_test, save_images):
