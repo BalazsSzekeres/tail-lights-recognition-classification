@@ -12,6 +12,7 @@ from torch.utils.tensorboard import SummaryWriter
 from net.Net import Net
 from net.LSTM import LSTM
 import yaml
+import wandb
 import imageio
 
 
@@ -152,10 +153,20 @@ def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_
             'Train_{}'.format(rnn_type): train_loss,
             'Test_{}'.format(rnn_type): test_loss
         }, epoch)
+
         writer.add_scalars('Accuracy', {
             'Train_{}'.format(rnn_type): train_acc,
             'Test_{}'.format(rnn_type): test_acc
         }, epoch)
+
+        # Write metrics to Weights and Biases
+        wandb.log({'Train_Loss_{}'.format(rnn_type): train_loss})
+        wandb.log({'Test_Loss_{}'.format(rnn_type): test_loss})
+        wandb.log({'Train_Accuracy_{}'.format(rnn_type): train_acc})
+        wandb.log({'Test_Accuracy_{}'.format(rnn_type): test_acc})
+
+        # # Optional
+        # wandb.watch(model)
 
     torch.save({'model': model.state_dict()}, os.path.join(weights_location, 'weights_{}'.format(epochs)))
     print('\nFinished.')

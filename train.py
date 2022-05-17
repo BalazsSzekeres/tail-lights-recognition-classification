@@ -11,8 +11,18 @@ from torch.utils.data import TensorDataset, DataLoader
 import mnist1d
 from mnist1d.data import get_templates, get_dataset_args, get_dataset
 from mnist1d.utils import set_seed, plot_signals, ObjectView, from_pickle
-
 from functions import run
+import wandb
+
+# Weights and biases
+wandb.init(project="tail-lights-recognition-classification", entity="bramvanriessen")
+
+# Weights and biases config
+wandb.config = {
+  "learning_rate": 0.001,
+  "epochs": 100,
+  "batch_size": 100
+}
 
 # Create save location
 save_weights = 'weights'  # Model weights will be saved here.
