@@ -8,21 +8,20 @@ from torch.utils.data import TensorDataset, DataLoader
 
 # Additional Setup for MNIST-1D
 # !git clone https://github.com/greydanus/mnist1d
-import mnist1d
 from mnist1d.data import get_templates, get_dataset_args, get_dataset
-from mnist1d.utils import set_seed, plot_signals, ObjectView, from_pickle
+from mnist1d.utils import plot_signals
 from functions import run
-import wandb
+# import wandb
 
 # Weights and biases
-wandb.init(project="tail-lights-recognition-classification", entity="bramvanriessen")
+# wandb.init(project="tail-lights-recognition-classification", entity="bramvanriessen")
 
 # Weights and biases config
-wandb.config = {
-  "learning_rate": 0.001,
-  "epochs": 100,
-  "batch_size": 100
-}
+# wandb.config = {
+#   "learning_rate": 0.001,
+#   "epochs": 100,
+#   "batch_size": 100
+# }
 
 # Create save location
 save_weights = 'weights'  # Model weights will be saved here.
@@ -50,10 +49,6 @@ test_loader = DataLoader(test_set, batch_size=b_size)
 
 # Get some data and check for dimensions
 data_input, label = next(iter(train_loader))
-
-# Check whether the data has the right dimensions
-# assert(input.shape == torch.Size([b_size, 40]))
-# assert(label.shape == torch.Size([b_size]))
 
 # Display samples from dataset
 templates = get_templates()

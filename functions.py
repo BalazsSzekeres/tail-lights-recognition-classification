@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import torch
 import torch.nn as nn
 from tqdm import tqdm
@@ -12,8 +11,10 @@ from torch.utils.tensorboard import SummaryWriter
 from net.Net import Net
 from net.LSTM import LSTM
 import yaml
-import wandb
-import imageio
+import numpy as np
+
+
+# import wandb
 
 
 def train(train_loader, model, optimizer, criterion, device):
@@ -95,7 +96,7 @@ def test(test_loader, model, criterion, device):
     return avg_loss / len(test_loader), 100 * correct / total
 
 
-def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_size=10):
+def run(model_type, trainloader, testloader, weights_location, epochs=100):
     """
     Run a test on MNIST-1D
 
@@ -103,27 +104,13 @@ def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_
         weights_location: location for saving weights
         trainloader: training data
         testloader: test data
-        rnn_type: lstm
+        model_type: type of model
         epochs: number of epochs to run
-        hidden_size: dimension of hidden state of rnn cell
     """
     # Create a writer to write to Tensorboard
     writer = SummaryWriter()
 
-    if rnn_type == 'lstm':
-        rnn = LSTM(1, hidden_size)
-        # Create classifier model
-        model = nn.Sequential(OrderedDict([
-            ('reshape', nn.Unflatten(1, (40, 1))),
-            ('rnn', rnn),
-            ('flat', nn.Flatten()),
-            ('classifier', nn.Linear(40 * hidden_size, 10))
-        ]))
-    else:
-        config_file = "config/net.yaml"
-        config = yaml.load(open(config_file), Loader=yaml.FullLoader)
-
-        model = Net(config)
+    model = config_model(model_type)
 
     # Create loss function and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -150,20 +137,20 @@ def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_
 
         # Write metrics to Tensorboard
         writer.add_scalars('Loss', {
-            'Train_{}'.format(rnn_type): train_loss,
-            'Test_{}'.format(rnn_type): test_loss
+            'Train_{}'.format(model_type): train_loss,
+            'Test_{}'.format(model_type): test_loss
         }, epoch)
 
         writer.add_scalars('Accuracy', {
-            'Train_{}'.format(rnn_type): train_acc,
-            'Test_{}'.format(rnn_type): test_acc
+            'Train_{}'.format(model_type): train_acc,
+            'Test_{}'.format(model_type): test_acc
         }, epoch)
 
         # Write metrics to Weights and Biases
-        wandb.log({'Train_Loss_{}'.format(rnn_type): train_loss})
-        wandb.log({'Test_Loss_{}'.format(rnn_type): test_loss})
-        wandb.log({'Train_Accuracy_{}'.format(rnn_type): train_acc})
-        wandb.log({'Test_Accuracy_{}'.format(rnn_type): test_acc})
+        # wandb.log({'Train_Loss_{}'.format(model_type): train_loss})
+        # wandb.log({'Test_Loss_{}'.format(model_type): test_loss})
+        # wandb.log({'Train_Accuracy_{}'.format(model_type): train_acc})
+        # wandb.log({'Test_Accuracy_{}'.format(model_type): test_acc})
 
         # # Optional
         # wandb.watch(model)
@@ -174,12 +161,65 @@ def run(rnn_type, trainloader, testloader, weights_location, epochs=100, hidden_
     writer.close()
 
 
-def run_test(model, dataloader_test, save_images):
+def evaluate(model, dataloader_test, save_csv_files, device):
+    """
+    Run a test on MNIST-1D
+
+    Args:
+        save_csv_files: CSV file location
+        device: Device is either cpu or cuda
+        dataloader_test: Test set
+        model: Model to evaluate
+    """
     with torch.no_grad():
         model.eval()
-        for image_num, img in enumerate(dataloader_test):
-            print(image_num, img)
-            # inputs = img.to(next(model.parameters()).device)
-            # pred = model(img)
-            # for i in range(len(image_num)):
-            #     print("gt: {}, pred: {}".format(image_num[i], pred[i]))
+        accuracy_list = []
+        for index, img in enumerate(dataloader_test):
+            images, labels = img
+            images = images.to(device)
+            labels = labels.to(device)
+            pred = model(images)
+            pred_indices = torch.argmax(pred, 1)
+            accuracy = (pred_indices == labels).sum().item() / labels.size(0)
+            # print('Predictions: ', pred_indices)
+            # print('Labels: ', labels)
+            # print('Results: ', pred_indices == labels)
+            # print('Accuracy: ', accuracy)
+            accuracy_list.append(accuracy)
+            # print('Predictions size: ', pred.size())
+            # print("label: {}, pred: {}".format(label, pred))
+
+        accuracy_avg = sum(accuracy_list) / len(accuracy_list)
+        print('Average accuracy: ', accuracy_avg)
+
+        np.savetxt(os.path.join(save_csv_files, 'Test_avg_accuracy_{}.csv'.format(accuracy_avg)),
+                   [p for p in zip(labels.cpu(), pred_indices.cpu(), (pred_indices == labels).cpu())],
+                   header='Labels, Prediction, Result', delimiter=',', fmt='%s')
+
+
+def config_model(model_type, hidden_size=10):
+    """
+    Configure model based on given model type
+
+    Args:
+        model_type: Type of model (eg. LSTM)
+        hidden_size: Hidden size or layer
+
+    Returns:
+        model
+    """
+    if model_type == 'lstm':
+        rnn = LSTM(1, hidden_size)
+        # Create classifier model
+        model = nn.Sequential(OrderedDict([
+            ('reshape', nn.Unflatten(1, (40, 1))),
+            ('rnn', rnn),
+            ('flat', nn.Flatten()),
+            ('classifier', nn.Linear(40 * hidden_size, 10))
+        ]))
+    else:
+        config_file = "config/net.yaml"
+        config = yaml.load(open(config_file), Loader=yaml.FullLoader)
+
+        model = Net(config)
+    return model

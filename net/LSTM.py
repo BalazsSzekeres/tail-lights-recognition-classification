@@ -31,21 +31,11 @@ class LSTM(nn.Module):
         # Hidden to hidden biases
         self.bias_hh = None
 
-        ########################################################################
-        #    TODO: Create weight and bias tensors with given name above with   #
-        #                             correct sizes.                           #
-        # NOTE: Don't forget to encapsulate weights and biases in nn.Parameter #
-        ########################################################################
-
         # LSTM parameters
         self.weight_xh = nn.Parameter(torch.Tensor(input_size, 4 * hidden_size))
         self.weight_hh = nn.Parameter(torch.Tensor(hidden_size, 4 * hidden_size))
         self.bias_xh = nn.Parameter(torch.Tensor(4 * hidden_size))
         self.bias_hh = nn.Parameter(torch.Tensor(4 * hidden_size))
-
-        ########################################################################
-        #                         END OF YOUR CODE                             #
-        ########################################################################
 
         # Initialize parameters
         self.reset_params()
@@ -64,43 +54,39 @@ class LSTM(nn.Module):
     def forward(self, x):
         """
         Args:
-            x: input with shape (N, T, D) where N is number of samples, T is
+            x: input with shape (n, tt, D) where n is number of samples, tt is
                 number of timestep and D is input size which must be equal to
                 self.input_size.
 
         Returns:
-            y: output with a shape of (N, T, H) where H is hidden size
+            y: output with a shape of (n, tt, h) where h is hidden size
         """
 
         # Transpose input for efficient vectorized calculation. After transposing
-        # the input will have (T, N, D).
+        # the input will have (tt, n, D).
         x = x.transpose(0, 1)
 
         # Unpack dimensions
-        T, N, H = x.shape[0], x.shape[1], self.hidden_size
+        tt, n, h = x.shape[0], x.shape[1], self.hidden_size
 
         # Initialize hidden and cell states to zero. There will be one hidden
-        # and cell state for each input, so they will have shape of (N, H)
-        h0 = torch.zeros(N, H, device=x.device)
-        c0 = torch.zeros(N, H, device=x.device)
+        # and cell state for each input, so they will have shape of (n, h)
+        h0 = torch.zeros(n, h, device=x.device)
+        c0 = torch.zeros(n, h, device=x.device)
 
         # Define a list to store outputs. We will then stack them.
         y = []
 
-        ########################################################################
-        #                 TODO: Implement forward pass of LSTM                 #
-        ########################################################################
-
         ht_1 = h0
         ct_1 = c0
-        for t in range(T):
+        for t in range(tt):
             # LSTM update rule
             xh = torch.addmm(self.bias_xh, x[t], self.weight_xh)
             hh = torch.addmm(self.bias_hh, ht_1, self.weight_hh)
-            it = torch.sigmoid(xh[:, 0:H] + hh[:, 0:H])
-            ft = torch.sigmoid(xh[:, H:2 * H] + hh[:, H:2 * H])
-            gt = torch.tanh(xh[:, 2 * H:3 * H] + hh[:, 2 * H:3 * H])
-            ot = torch.sigmoid(xh[:, 3 * H:4 * H] + hh[:, 3 * H:4 * H])
+            it = torch.sigmoid(xh[:, 0:h] + hh[:, 0:h])
+            ft = torch.sigmoid(xh[:, h:2 * h] + hh[:, h:2 * h])
+            gt = torch.tanh(xh[:, 2 * h:3 * h] + hh[:, 2 * h:3 * h])
+            ot = torch.sigmoid(xh[:, 3 * h:4 * h] + hh[:, 3 * h:4 * h])
             ct = ft * ct_1 + it * gt
             ht = ot * torch.tanh(ct)
 
@@ -111,14 +97,10 @@ class LSTM(nn.Module):
             ct_1 = ct
             ht_1 = ht
 
-        ########################################################################
-        #                         END OF YOUR CODE                             #
-        ########################################################################
-
         # Stack the outputs. After this operation, output will have shape of
-        # (T, N, H)
+        # (tt, n, h)
         y = torch.stack(y)
 
-        # Switch time and batch dimension, (T, N, H) -> (N, T, H)
+        # Switch time and batch dimension, (tt, n, h) -> (n, tt, h)
         y = y.transpose(0, 1)
         return y

@@ -4,3 +4,4 @@ torchsummary
 pyyaml
 numpy
 tqdm
+wandb
