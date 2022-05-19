@@ -117,7 +117,8 @@ def run(model_type, trainloader, testloader, weights_location, epochs=100):
     optimizer = optim.Adam(model.parameters(), 1e-2, weight_decay=1e-3)
 
     # Use GPU if available
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cpu'
+    print(device)
 
     model = model.to(device)
 
@@ -135,16 +136,16 @@ def run(model_type, trainloader, testloader, weights_location, epochs=100):
                                    criterion,
                                    device)
 
-        # Write metrics to Tensorboard
-        writer.add_scalars('Loss', {
-            'Train_{}'.format(model_type): train_loss,
-            'Test_{}'.format(model_type): test_loss
-        }, epoch)
-
-        writer.add_scalars('Accuracy', {
-            'Train_{}'.format(model_type): train_acc,
-            'Test_{}'.format(model_type): test_acc
-        }, epoch)
+        # # Write metrics to Tensorboard
+        # writer.add_scalars('Loss', {
+        #     'Train_{}'.format(model_type): train_loss,
+        #     'Test_{}'.format(model_type): test_loss
+        # }, epoch)
+        #
+        # writer.add_scalars('Accuracy', {
+        #     'Train_{}'.format(model_type): train_acc,
+        #     'Test_{}'.format(model_type): test_acc
+        # }, epoch)
 
         # Write metrics to Weights and Biases
         wandb.log({'Train_Loss_{}'.format(model_type): train_loss})

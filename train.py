@@ -14,7 +14,7 @@ from functions import run
 import wandb
 
 # Weights and biases
-wandb.init(project="tail-lights-recognition-classification", entity="bramvanriessen")
+wandb.init(project="tail-lights-recognition-classification", entity="balazsszekeres")
 
 # Weights and biases config
 wandb.config = {

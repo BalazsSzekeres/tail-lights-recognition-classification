@@ -35,7 +35,7 @@ class DataFormatting:
         automaton.make_automaton()
 
         manager = Manager()
-        data_dict_list = manager.list(self.raw_data)
+        data_dict_list = manager.list()
 
         # data_dict_list = []
         # data_dict_list = (self.raw_data).copy()
@@ -43,9 +43,9 @@ class DataFormatting:
         with Pool(processes=(cpu_count())) as pool:
             max_ = len(self.raw_data)
             with tqdm(total=max_) as pbar:
-                for i, _ in enumerate(pool.imap_unordered(partial(get_entry,
+                for i, _ in enumerate(pool.imap_unordered(partial(append_entry,
                                                                   data_dict_list,
-                                                                  automaton), self.raw_data)):
+                                                                  automaton), self.raw_data[1])):
                     pbar.update()
         # max_ = len(self.raw_data)
         # with tqdm(total=max_) as pbar:

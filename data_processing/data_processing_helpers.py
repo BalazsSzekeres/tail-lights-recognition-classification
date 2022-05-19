@@ -27,10 +27,12 @@ def get_list_of_pictures(directory: str) -> List:
     return picture_list
 
 
-def findit_with_ahocorasick(automaton, element, list_of_pictures):
+def findit_with_ahocorasick(automaton, element):
     try:
-        index = next(automaton.iter(element))[0]
-        return list_of_pictures[index]
+        result = next(automaton.iter(element))
+        index = result[0]
+        entry = result[1]
+        return element, entry
     except StopIteration:
         return None
 

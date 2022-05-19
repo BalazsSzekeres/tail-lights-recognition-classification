@@ -82,7 +82,7 @@ class DataLoader:
 
         automaton.make_automaton()
 
-        output = [findit_with_ahocorasick(automaton, element, self.list_of_all_pictures)
+        output = [findit_with_ahocorasick(automaton, element)
                   for element in self.list_of_all_pictures]
 
         output = list(filter(None, output))
