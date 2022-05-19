@@ -9,8 +9,8 @@ if __name__ == "__main__":
     print(data_list)
     print(f"Async takes a total of {time.time() - start_time} seconds")
 
-    start_time = time.time()
-    data_list = data_formatter.get_list_dict()
-    print(f"Sync takes a total of {time.time() - start_time} seconds")
-
+    # start_time = time.time()
+    # data_list = data_formatter.get_list_dict()
+    # print(f"Sync takes a total of {time.time() - start_time} seconds")
+    #
 
