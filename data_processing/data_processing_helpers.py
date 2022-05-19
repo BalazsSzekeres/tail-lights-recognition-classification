@@ -1,8 +1,8 @@
 import os
 from typing import List, Optional
-# import torch
-# from PIL import Image
-# import torchvision.transforms as transforms
+import torch
+from PIL import Image
+import torchvision.transforms as transforms
 
 
 def get_frame_list(path: str) -> List:
@@ -33,6 +33,7 @@ def findit_with_ahocorasick(automaton, element, list_of_pictures):
         return list_of_pictures[index]
     except StopIteration:
         return None
+
 
 def read_image_to_tensor(file_path: str):
     image = Image.open(file_path)
