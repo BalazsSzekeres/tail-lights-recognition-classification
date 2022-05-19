@@ -14,7 +14,7 @@ import yaml
 import numpy as np
 
 
-# import wandb
+import wandb
 
 
 def train(train_loader, model, optimizer, criterion, device):
@@ -147,10 +147,10 @@ def run(model_type, trainloader, testloader, weights_location, epochs=100):
         }, epoch)
 
         # Write metrics to Weights and Biases
-        # wandb.log({'Train_Loss_{}'.format(model_type): train_loss})
-        # wandb.log({'Test_Loss_{}'.format(model_type): test_loss})
-        # wandb.log({'Train_Accuracy_{}'.format(model_type): train_acc})
-        # wandb.log({'Test_Accuracy_{}'.format(model_type): test_acc})
+        wandb.log({'Train_Loss_{}'.format(model_type): train_loss})
+        wandb.log({'Test_Loss_{}'.format(model_type): test_loss})
+        wandb.log({'Train_Accuracy_{}'.format(model_type): train_acc})
+        wandb.log({'Test_Accuracy_{}'.format(model_type): test_acc})
 
         # # Optional
         # wandb.watch(model)
