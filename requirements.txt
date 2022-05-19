@@ -2,3 +2,6 @@ torch
 torchvision
 torchsummary
 pyyaml
+numpy
+tqdm
+wandb
