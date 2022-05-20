@@ -65,15 +65,18 @@ class DataLoader:
 
     def filter_list(self):
 
-        match self.difficulty:
-            case 'Easy':
-                files = self.easy_files_list
-            case 'Moderate':
-                files = self.moderate_files_list
-            case 'Hard':
-                files = self.hard_files_list
-            case _:
-                raise ValueError("Difficulty must be Easy, Moderate or Hard!")
+        # match self.difficulty:
+        #     case 'Easy':
+        #         files = self.easy_files_list
+        #     case 'Moderate':
+        #         files = self.moderate_files_list
+        #     case 'Hard':
+        #         files = self.hard_files_list
+        #     case _:
+        #         raise ValueError("Difficulty must be Easy, Moderate or Hard!")
+        if self.difficulty not in ["Easy", "Moderate", "Hard"]:
+            raise ValueError("Difficulty must be Easy, Moderate or Hard!")
+        files = getattr(self, f"{self.difficulty.lower()}_files_list")
 
         automaton = ahocorasick.Automaton()
 
