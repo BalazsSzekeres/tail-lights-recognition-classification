@@ -70,23 +70,26 @@ class Net(nn.Module):
         })
 
     def forward(self, x):
-        """Forward an input through the CNN-LSTM network."""
+        if isinstance(x, list):
+            return self.forward_sequence_list(x)
+        elif isinstance(x, torch.Tensor):
+            """Forward an input through the CNN-LSTM network."""
 
-        # First, pass the input through the CNN
-        x = self.model['cnn'](x)
+            # First, pass the input through the CNN
+            x = self.model['cnn'](x)
 
-        # Then, reshape the input and pass it through the LSTM
-        x = x.view(x.shape[0], 1, -1)
-        x = self.model['lstm'](x)[0].squeeze(dim=1)
+            # Then, reshape the input and pass it through the LSTM
+            x = x.view(x.shape[0], 1, -1)
+            x = self.model['lstm'](x)[0].squeeze(dim=1)
 
-        # From the paper:
-        # "The output of each LSTM layer is sent to the last fully connected layer of our network
-        # to compute a class probability for each time step"
-        y = self.model['out'](x)
+            # From the paper:
+            # "The output of each LSTM layer is sent to the last fully connected layer of our network
+            # to compute a class probability for each time step"
+            y = self.model['out'](x)
 
-        # "Given a test frame, instead of taking average among the output predictions, we take the
-        # prediction of the last frame as the label for the entire input sequence."
-        return y[-1]
+            # "Given a test frame, instead of taking average among the output predictions, we take the
+            # prediction of the last frame as the label for the entire input sequence."
+            return y[-1]
 
     def forward_sequence_list(self, x_list: List[torch.Tensor]):
         """Forward a list of sequences"""

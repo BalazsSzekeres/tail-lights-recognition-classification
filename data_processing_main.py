@@ -13,7 +13,7 @@ def new_read_img(data_list_element):
 
 
 if __name__ == "__main__":
-    data_loader = DataLoader(root_directory="./rear_signal_dataset/", difficulty="Easy")
+    data_loader = DataLoader(root_directory="../rear_signal_dataset/", difficulty="Easy")
 
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()

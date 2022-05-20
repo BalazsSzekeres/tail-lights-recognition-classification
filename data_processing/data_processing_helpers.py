@@ -37,7 +37,10 @@ def findit_with_ahocorasick(automaton, element):
         return None
 
 
-transform = transforms.ToTensor()
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Resize((227, 227))
+])
 
 
 def read_image_to_tensor(file_path: str):
