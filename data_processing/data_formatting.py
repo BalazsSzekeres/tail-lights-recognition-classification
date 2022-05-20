@@ -1,6 +1,9 @@
+from dataclasses import dataclass
 from multiprocessing import Pool, cpu_count, Manager
 from typing import List
 import re
+
+import torch
 from tqdm import tqdm
 from functools import partial
 import ahocorasick
@@ -10,11 +13,19 @@ from data_processing import DataLoader, read_image_to_tensor
 classes = ['OOO', 'BOO', 'OLO', 'BLO', 'OOR', 'BOR', 'OLR', 'BLR']
 
 
+@dataclass
+class FrameEntry:
+    name: str
+    location: str
+    data_class: str
+    picture: torch.Tensor
+
+
 class DataProcessor:
     def __init__(self, raw_data: List):
         self.raw_data = raw_data
 
-    def get_list_dict(self):
+    def get_frame_list(self):
         automaton = ahocorasick.Automaton()
         for name in classes:
             automaton.add_word(name, name)
@@ -27,7 +38,7 @@ class DataProcessor:
 
         return data_dict_list
 
-    def get_list_dict_async(self):
+    def get_frame_list_async(self):
         automaton = ahocorasick.Automaton()
         for name in classes:
             automaton.add_word(name, name)
@@ -48,13 +59,10 @@ class DataProcessor:
 
 
 def append_entry(list_to_append, automaton_instance, raw_data_point):
-    print("")
-    new_entry = {
-        'name': raw_data_point[1],
-        'location': raw_data_point[0],
-        'class': findit_with_ahocorasick_name(automaton_instance, raw_data_point[0]),
-        'picture': read_image_to_tensor(raw_data_point[0])
-    }
+    new_entry = FrameEntry(name=raw_data_point[1],
+                           location=raw_data_point[0],
+                           data_class=findit_with_ahocorasick_name(automaton_instance, raw_data_point[0]),
+                           picture=read_image_to_tensor(raw_data_point[0]))
 
     list_to_append.append(new_entry)
 
