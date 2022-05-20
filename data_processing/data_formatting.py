@@ -1,4 +1,3 @@
-from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import Pool, cpu_count, Manager
 from typing import List
 import re
@@ -11,7 +10,7 @@ from data_processing import DataLoader, read_image_to_tensor
 classes = ['OOO', 'BOO', 'OLO', 'BLO', 'OOR', 'BOR', 'OLR', 'BLR']
 
 
-class DataFormatting:
+class DataProcessor:
     def __init__(self, raw_data: List):
         self.raw_data = raw_data
 
@@ -37,49 +36,27 @@ class DataFormatting:
         manager = Manager()
         data_dict_list = manager.list()
 
-        # data_dict_list = []
-        # data_dict_list = (self.raw_data).copy()
-
         with Pool(processes=(cpu_count())) as pool:
             max_ = len(self.raw_data)
             with tqdm(total=max_) as pbar:
                 for i, _ in enumerate(pool.imap_unordered(partial(append_entry,
                                                                   data_dict_list,
-                                                                  automaton), self.raw_data[1])):
+                                                                  automaton), self.raw_data)):
                     pbar.update()
-        # max_ = len(self.raw_data)
-        # with tqdm(total=max_) as pbar:
-        #     with ProcessPoolExecutor(max_workers=cpu_count()) as executor:
-        #         for i, r in enumerate(executor.map(partial(get_entry, data_dict_list, automaton), self.raw_data)):
-        #             data_dict_list[i] = r
-        #             pbar.update()
 
         return data_dict_list
 
 
 def append_entry(list_to_append, automaton_instance, raw_data_point):
+    print("")
     new_entry = {
-        'name': get_label(raw_data_point),
-        'location': raw_data_point,
-        'class': findit_with_ahocorasick_name(automaton_instance, raw_data_point),
-        'picture': read_image_to_tensor(raw_data_point)}
-    # print(new_entry)
+        'name': raw_data_point[1],
+        'location': raw_data_point[0],
+        'class': findit_with_ahocorasick_name(automaton_instance, raw_data_point[0]),
+        'picture': read_image_to_tensor(raw_data_point[0])
+    }
+
     list_to_append.append(new_entry)
-
-
-def get_entry(list_to_append, automaton_instance, raw_data_point):
-    new_entry = {
-        'name': get_label(raw_data_point),
-        'location': raw_data_point,
-        'class': findit_with_ahocorasick_name(automaton_instance, raw_data_point),
-        'picture': read_image_to_tensor(raw_data_point)}
-    # new_entry = read_image_to_tensor(raw_data_point)
-    return new_entry
-
-
-def get_label(raw_data_point):
-    label = re.search('/rear_signal_dataset/(.*?)/light_mask', raw_data_point).group(1)
-    return label
 
 
 def findit_with_ahocorasick_name(automaton, element):
