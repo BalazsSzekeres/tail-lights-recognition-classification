@@ -37,8 +37,8 @@ def findit_with_ahocorasick(automaton, element):
         return None
 
 
+transform = transforms.ToTensor()
+
+
 def read_image_to_tensor(file_path: str):
-    image = Image.open(file_path)
-    transform = transforms.ToTensor()
-    tensor = transform(image)
-    return tensor
+    return transform(Image.open(file_path))

@@ -18,7 +18,7 @@ class FrameEntry:
     name: str
     location: str
     data_class: str
-    picture: torch.Tensor
+    picture: torch.Tensor = None
 
 
 class DataProcessor:
@@ -62,7 +62,8 @@ def append_entry(list_to_append, automaton_instance, raw_data_point):
     new_entry = FrameEntry(name=raw_data_point[1],
                            location=raw_data_point[0],
                            data_class=findit_with_ahocorasick_name(automaton_instance, raw_data_point[0]),
-                           picture=read_image_to_tensor(raw_data_point[0]))
+                           #picture=read_image_to_tensor(raw_data_point[0])
+                           )
 
     list_to_append.append(new_entry)
 
