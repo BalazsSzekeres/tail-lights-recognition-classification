@@ -51,7 +51,7 @@ class DataProcessor:
         return data_dict_list
 
     @staticmethod
-    def convert_to_train_test(data_dict_list, n_train_sequences=None, n_test_sequences=None, shuffle=True):
+    def convert_to_train_test(data_dict_list, n_train_sequences=None, n_test_sequences=None, shuffle=True, max_sequence_size=None):
         """
         Convert the data_dict_list to sequence maps for training and for testing
         Also return a list of all images to allow easy loading
@@ -61,6 +61,9 @@ class DataProcessor:
         all_sequences = {}
         for name in sequence_names:
             all_sequences[name] = sorted([e for e in data_dict_list if name == e.name], key=lambda e: e.name)
+
+            if max_sequence_size:
+                all_sequences[name] = all_sequences[name][:max_sequence_size]
 
         train_sequence_names = [name for name in sequence_names if "test" not in name]
         test_sequence_names = [name for name in sequence_names if "test" in name]
@@ -75,7 +78,14 @@ class DataProcessor:
 
         train_sequences = {k: v for k, v in all_sequences.items() if k in train_sequence_names}
         test_sequences = {k: v for k, v in all_sequences.items() if k in test_sequence_names}
-        data_dict_list = [e for e in data_dict_list if e.name in train_sequence_names or e.name in test_sequence_names]
+
+        if n_test_sequences is not None or n_train_sequences is not None:
+            # Update the list of all frame entries
+            data_dict_list = []
+            for name, frame_list in train_sequences.items():
+                data_dict_list += frame_list
+            for name, frame_list in test_sequences.items():
+                data_dict_list += frame_list
         return train_sequences, test_sequences, data_dict_list
 
     def sequence_map_to_torch_loader(self, sequences, batch_size) -> th.utils.data.DataLoader:

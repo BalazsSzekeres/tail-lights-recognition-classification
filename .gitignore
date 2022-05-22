@@ -136,3 +136,5 @@ dmypy.json
 /mnist1d_data.pkl
 
 /runs/
+
+/weights/
