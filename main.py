@@ -31,6 +31,7 @@ def parse_args():
 
 
 def main():
+    torch.cuda.empty_cache()
     random.seed(123)
     args = parse_args()
     config = yaml.safe_load(open(args.config).read())
@@ -59,7 +60,8 @@ def main():
                                                                                       max_sequence_size=config.get("max_sequence_size"))
 
     data_list[:] = map(read_img, tqdm(data_list))
-
+    print("Train sequences: ", len(train_sequences))
+    print("Test sequences: ", len(test_sequences))
     train_loader = data_processor.sequence_map_to_torch_loader(train_sequences, config["batch_size"])
     test_loader = data_processor.sequence_map_to_torch_loader(test_sequences, config["batch_size"])
 

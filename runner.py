@@ -1,6 +1,7 @@
 import os
 import torch
 import torch.nn as nn
+from torch.autograd import Variable
 from tqdm import tqdm
 import torch.optim as optim
 from collections import OrderedDict
@@ -36,13 +37,19 @@ class Runner:
 
         # Iterate through batches
         for i, data in enumerate(self.train_loader):
-            # Get the inputs; data is a list of [inputs, labels]
-            inputs, labels = data
-
+            print(i)
             # Zero the parameter gradients
             self.optimizer.zero_grad()
 
+            # Get the inputs; data is a list of [inputs, labels]
+            inputs, labels = data
+
             # Move data to target device
+            # inputs = Variable(inputs.to(self.device))
+            # labels = Variable(labels.to(self.device))
+            # outputs = self.model(inputs)
+            # loss = self.criterion(outputs, labels)
+
             labels = labels.to(self.device)
             # Trying out some different things for input
             # inputs = [seq.to(self.device) for seq in inputs]
@@ -56,10 +63,17 @@ class Runner:
             loss.backward()
             self.optimizer.step()
 
+            print("Outputs data: ", outputs.data)
+            print("Labels: ", labels)
+
             # Keep track of loss and accuracy
             avg_loss += loss
             _, predicted = torch.max(outputs.data, 1)
             _, labels = torch.max(labels, 1)
+
+            print("Predicted: ", predicted)
+            print("Max labels: ", labels)
+
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
@@ -92,6 +106,7 @@ class Runner:
 
                 # Keep track of loss and accuracy
                 avg_loss += loss
+
                 _, predicted = torch.max(outputs.data, 1)
                 _, labels = torch.max(labels, 1)
                 total += labels.size(0)
