@@ -106,9 +106,9 @@ class Runner:
             # Test on data
             test_loss, test_acc = self.test()
 
-            print(f"Epoch {epoch}:\n"
-                  f"\t{train_loss=}, {train_acc=}"
-                  f"\t{test_loss=}, {test_acc=}")
+            # print(f"Epoch {epoch}:\n"
+            #       f"\t{train_loss=}, {train_acc=}"
+            #       f"\t{test_loss=}, {test_acc=}")
 
             # # Write metrics to Tensorboard
             # writer.add_scalars('Loss', {

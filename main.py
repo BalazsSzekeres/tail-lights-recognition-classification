@@ -34,7 +34,7 @@ def main():
     random.seed(123)
     args = parse_args()
     config = yaml.safe_load(open(args.config).read())
-    print(f"{config=}")
+    #print(f"{config=}")
     if config["wandb"]:
         # Weights and biases
         wandb.init(project="tail-lights-recognition-classification", entity="bramvanriessen")
