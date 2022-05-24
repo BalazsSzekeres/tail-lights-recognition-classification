@@ -31,6 +31,7 @@ def parse_args():
 
 
 def main():
+    torch.cuda.empty_cache()
     random.seed(123)
     args = parse_args()
     config = yaml.safe_load(open(args.config).read())
