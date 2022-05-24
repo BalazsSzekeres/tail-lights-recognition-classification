@@ -20,7 +20,7 @@ from runner import Runner
 
 
 def read_img(data_list_element):
-    data_list_element.picture = read_image_to_tensor(data_list_element.location)#.to('cuda')
+    data_list_element.picture = read_image_to_tensor(data_list_element.location).to('cuda')
 
 
 def parse_args():
@@ -48,8 +48,8 @@ def main():
         os.makedirs(save_weights)
 
     # Load dataset
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    device = 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # device = 'cpu'
     data_loader = DataLoader(root_directory=args.data_root, difficulty=config["difficulty"])
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()
