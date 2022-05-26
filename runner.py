@@ -57,7 +57,7 @@ class Runner:
             self.optimizer.step()
 
             # Keep track of loss and accuracy
-            avg_loss += loss
+            avg_loss += float(loss)
             _, predicted = torch.max(outputs.data, 1)
             _, labels = torch.max(labels, 1)
             total += labels.size(0)
