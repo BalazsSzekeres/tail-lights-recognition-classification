@@ -34,6 +34,11 @@ class Runner:
         correct = 0
         total = 0
 
+        if torch.cuda.device_count() > 1:
+            print("Let's use", torch.cuda.device_count(), "GPUs!")
+            # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+            self.model = nn.DataParallel(self.model)
+
         # Iterate through batches
         for i, data in enumerate(self.train_loader):
             # Get the inputs; data is a list of [inputs, labels]

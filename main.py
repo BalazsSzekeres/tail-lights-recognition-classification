@@ -5,7 +5,7 @@ import shutil
 
 import torch
 import torch as th
-# import torch.nn as nn
+import torch.nn as nn
 # import torch.nn.functional as F
 # from torch.utils.data import TensorDataset, DataLoader
 
@@ -51,6 +51,7 @@ def main():
     # Load dataset
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     # device = 'cpu'
+
     data_loader = DataLoader(root_directory=args.data_root, difficulty=config["difficulty"])
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()
