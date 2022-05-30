@@ -24,7 +24,7 @@ class Runner:
         self.device = device
         self.writer = SummaryWriter()
         net_config = yaml.safe_load(open(os.path.join("config", "net", config["net"])).read())
-        self.model = Net(net_config).to(self.device)
+        self.model = nn.DataParallel(Net(net_config)).to(self.device)
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=config["learning_rate"],
                                     weight_decay=config["weight_decay"])
@@ -33,11 +33,6 @@ class Runner:
         avg_loss = 0
         correct = 0
         total = 0
-
-        if torch.cuda.device_count() > 1:
-            print("Let's use", torch.cuda.device_count(), "GPUs!")
-            # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-            self.model = nn.DataParallel(self.model)
 
         # Iterate through batches
         for i, data in enumerate(self.train_loader):

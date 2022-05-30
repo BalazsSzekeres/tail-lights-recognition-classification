@@ -92,7 +92,7 @@ class DataProcessor:
         # 0 because we focus on brakes for now
         data_set = SequenceDataSet(sequences, 0)
         data_loader = th.utils.data.DataLoader(data_set, batch_size=batch_size, collate_fn=data_set.collate_fn,
-                                               shuffle=True)
+                                               shuffle=True, pin_memory=True)
         return data_loader
 
 
