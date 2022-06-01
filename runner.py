@@ -48,10 +48,9 @@ class Runner:
             # inputs = [seq.to(self.device) for seq in inputs]
             outputs = torch.empty(len(inputs), 2).to(self.device)
             for i, input in enumerate(inputs):
-                outputs[i] = self.model(input.to(self.device))
+                outputs[i] = self.model(input)
 
             # Forward + backward + optimize
-            # outputs = self.model(inputs)
             loss = self.criterion(outputs, labels)
             loss.backward()
             self.optimizer.step()
@@ -84,10 +83,9 @@ class Runner:
                 # inputs = [seq.to(self.device) for seq in inputs]
                 outputs = torch.empty(len(inputs), 2).to(self.device)
                 for i, input in enumerate(inputs):
-                    outputs[i] = self.model(input.to(self.device))
+                    outputs[i] = self.model(input)
 
                 # Forward pass
-                outputs = self.model(inputs)
                 loss = self.criterion(outputs, labels)
 
                 # Keep track of loss and accuracy

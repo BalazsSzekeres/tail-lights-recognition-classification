@@ -21,8 +21,8 @@ from runner import Runner
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def read_img(data_list_element):
-    data_list_element.picture = read_image_to_tensor(data_list_element.location).to(device)
-
+    data_list_element.picture = read_image_to_tensor(data_list_element.location)
+    return data_list_element
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -34,6 +34,7 @@ def parse_args():
 def main():
     torch.cuda.empty_cache()
     random.seed(123)
+    torch.manual_seed(123)
     args = parse_args()
     config = yaml.safe_load(open(args.config).read())
     #print(f"{config=}")
@@ -53,6 +54,9 @@ def main():
     data_loader = DataLoader(root_directory=args.data_root, difficulty=config["difficulty"])
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()
+
+    key_val_list = ['OOO', 'BOO']
+    data_list = [el for el in data_list if el.data_class in key_val_list]
 
     train_sequences, test_sequences, data_list = data_processor.convert_to_train_test(data_list, config.get("n_train"),
                                                                                       config.get("n_test"),

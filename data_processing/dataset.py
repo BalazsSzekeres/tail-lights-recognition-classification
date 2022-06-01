@@ -12,10 +12,28 @@ class SequenceDataSet:
 
     def __init__(self, sequences: SequenceMap, letter_idx):
         self.letter_idx = letter_idx
+        self.sequences = []
+        # self.sequences = []
+        # all_names = sequences.keys()
+        # for name in all_names:
+        #     entry_list = sequences[name]
+        # self.sequences.append({
+        #     # "name": name,
+        #     "sequence": torch.stack([e.picture for e in entry_list]),
+        #     "class": self.class_to_tensor(entry_list[0].data_class),
+        # })
+        # del sequences[name]
+        # for name, entry_list in sequences.items():
+        #     self.sequences.append({
+        #         # "name": name,
+        #         "sequence": torch.stack([e.picture for e in entry_list]),
+        #         "class": self.class_to_tensor(entry_list[0].data_class),
+        #     })
+
         self.sequences = [
             {
                 # "name": name,
-                "sequence": torch.stack([e.picture for e in entry_list]),
+                "sequence": torch.stack([e.picture for e in entry_list]).to('cuda'),
                 "class": self.class_to_tensor(entry_list[0].data_class),
             }
             for name, entry_list in sequences.items()
