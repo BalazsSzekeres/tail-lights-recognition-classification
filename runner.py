@@ -25,7 +25,8 @@ class Runner:
         self.writer = SummaryWriter()
         net_config = yaml.safe_load(open(os.path.join("config", "net", config["net"])).read())
         self.model = Net(net_config).to(self.device)
-        self.criterion = nn.CrossEntropyLoss()
+        # self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.MSELoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=config["learning_rate"],
                                     weight_decay=config["weight_decay"])
 
