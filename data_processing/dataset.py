@@ -77,7 +77,7 @@ class CustomDataLoader:
         return self
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.dataset) // self.batch_size + 1
 
     def __next__(self):
         if self.iter_i == len(self.dataset):
