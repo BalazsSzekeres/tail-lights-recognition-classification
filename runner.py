@@ -101,6 +101,13 @@ class Runner:
         return avg_loss / len(self.test_loader), 100 * correct / total
 
     def run(self):
+        # Patience - how many epochs to keep training after accuracy has not improved
+        patience = self.config["patience"]
+
+        # Initialize early stopping variables
+        test_acc_best = 0
+        patience_cnt = 0
+
         for epoch in tqdm(range(self.config["epochs"])):
             # Train on data
             train_loss, train_acc = self.train()
@@ -138,6 +145,16 @@ class Runner:
 
             if self.config["save_weights"]:
                 torch.save({'model': self.model.state_dict()}, os.path.join('weights', f'weights_{epoch}.pt'))
+
+            if self.config["early_stopping"] == True:
+                if test_acc > test_acc_best:
+                    test_acc_best = test_acc_best
+                    patience_cnt = 0
+                else:
+                    patience_cnt += 1
+                    if patience_cnt == patience:
+                        break
+
         print('\nFinished.')
         self.writer.flush()
         self.writer.close()

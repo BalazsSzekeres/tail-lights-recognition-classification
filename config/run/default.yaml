@@ -1,9 +1,11 @@
 wandb: True
 save_weights: True
-epochs: 50
+epochs: 100
 net: "net.yaml"
 learning_rate: 0.0001
-weight_decay: 0
+weight_decay: 0.0001
+early_stopping: True
+patience: 10
 batch_size: 100
 difficulty: Easy
 # These parameters allow training with a subset of sequences
