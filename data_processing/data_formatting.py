@@ -79,7 +79,7 @@ class DataProcessor:
         train_sequences = {k: v for k, v in all_sequences.items() if k in train_sequence_names}
         test_sequences = {k: v for k, v in all_sequences.items() if k in test_sequence_names}
 
-        if n_test_sequences is not None or n_train_sequences is not None:
+        if n_test_sequences is not None or n_train_sequences is not None or max_sequence_size is not None:
             # Update the list of all frame entries
             data_dict_list = []
             for name, frame_list in train_sequences.items():
