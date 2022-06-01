@@ -1,4 +1,4 @@
-wandb: True
+wandb: False
 save_weights: True
 epochs: 50
 net: "net.yaml"
@@ -8,6 +8,6 @@ batch_size: 100
 difficulty: Easy
 # These parameters allow training with a subset of sequences
 # Commenting makes sure all data is used
-#n_train: 8
+n_train: 50
 #n_test: 2
 max_sequence_size: 5

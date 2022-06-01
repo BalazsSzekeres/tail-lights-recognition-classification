@@ -123,11 +123,13 @@ class Runner:
             # Write metrics to Weights and Biases
             model_type = self.config["net"][:-5]
 
+            log_dict = {'Train_Loss_{}'.format(model_type): train_loss,
+                        'Test_Loss_{}'.format(model_type): test_loss,
+                        'Train_Accuracy_{}'.format(model_type): train_acc,
+                        'Test_Accuracy_{}'.format(model_type): test_acc}
+            print(log_dict)
             if self.config["wandb"]:
-                wandb.log({'Train_Loss_{}'.format(model_type): train_loss})
-                wandb.log({'Test_Loss_{}'.format(model_type): test_loss})
-                wandb.log({'Train_Accuracy_{}'.format(model_type): train_acc})
-                wandb.log({'Test_Accuracy_{}'.format(model_type): test_acc})
+                wandb.log(log_dict)
 
             # # Optional
             # wandb.watch(model)
