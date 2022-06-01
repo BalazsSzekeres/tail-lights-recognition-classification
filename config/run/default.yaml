@@ -8,6 +8,6 @@ batch_size: 32
 difficulty: Easy
 # These parameters allow training with a subset of sequences
 # Commenting makes sure all data is used
-n_train: 8
-n_test: 2
-#max_sequence_size: 2
+#n_train: 8
+#n_test: 2
+max_sequence_size: 5

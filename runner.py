@@ -35,7 +35,7 @@ class Runner:
         total = 0
 
         # Iterate through batches
-        for i, data in enumerate(self.train_loader):
+        for data in self.train_loader:
             # Get the inputs; data is a list of [inputs, labels]
             inputs, labels = data
 
@@ -46,9 +46,10 @@ class Runner:
             labels = labels.to(self.device)
             # Trying out some different things for input
             # inputs = [seq.to(self.device) for seq in inputs]
+            # outputs = torch.empty(len(inputs), 2).to(self.device)
             outputs = torch.empty(len(inputs), 2).to(self.device)
-            for i, input in enumerate(inputs):
-                outputs[i] = self.model(input)
+            for j in range(len(inputs)):
+                outputs[j] = self.model(inputs[j])
 
             # Forward + backward + optimize
             loss = self.criterion(outputs, labels)

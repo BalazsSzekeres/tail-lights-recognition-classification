@@ -4,6 +4,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from net.LSTM import LSTM
+
 
 class Net(nn.Module):
     def __init__(self, config):
@@ -63,6 +65,7 @@ class Net(nn.Module):
                 # (4096)
             ),
             'lstm': nn.LSTM(input_size=self.config["lstm"]["in"], hidden_size=self.config["lstm"]["hidden"]),
+            # 'lstm': LSTM(input_size=self.config["lstm"]["in"], hidden_size=self.config["lstm"]["hidden"]),
             'out': nn.Sequential(
                 nn.Linear(self.config["lstm"]["hidden"], self.config["output"]["size"]),
                 nn.Softmax(dim=1)
@@ -80,16 +83,16 @@ class Net(nn.Module):
 
             # Then, reshape the input and pass it through the LSTM
             x = x.view(x.shape[0], 1, -1)
-            x = self.model['lstm'](x)[0].squeeze(dim=1)
+            x = self.model['lstm'](x)[0][-1]
 
             # From the paper:
             # "The output of each LSTM layer is sent to the last fully connected layer of our network
             # to compute a class probability for each time step"
-            y = self.model['out'](x)
+            y = self.model['out'](x)[0]
 
             # "Given a test frame, instead of taking average among the output predictions, we take the
             # prediction of the last frame as the label for the entire input sequence."
-            return y[-1]
+            return y
 
     def forward_sequence_list(self, x_list: List[torch.Tensor]):
         """Forward a list of sequences"""
