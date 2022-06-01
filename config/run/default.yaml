@@ -1,4 +1,4 @@
-wandb: False
+wandb: True
 save_weights: True
 epochs: 50
 net: "net.yaml"
