@@ -47,7 +47,7 @@ class Runner:
             labels = labels.to(self.device)
             # Trying out some different things for input
             # inputs = [seq.to(self.device) for seq in inputs]
-            outputs = torch.empty(len(inputs), self.config["output"]["size"]).to(self.device)
+            outputs = torch.empty(len(inputs), 2).to(self.device)
             # outputs = torch.empty(len(inputs), 1).to(self.device)
             for j in range(len(inputs)):
                 outputs[j] = self.model(inputs[j])
@@ -83,7 +83,7 @@ class Runner:
                 # Trying out some different things for input
                 # inputs = inputs.to(self.device)
                 # inputs = [seq.to(self.device) for seq in inputs]
-                outputs = torch.empty(len(inputs), self.config["output"]["size"]).to(self.device)
+                outputs = torch.empty(len(inputs), 2).to(self.device)
                 # outputs = torch.empty(len(inputs), 1).to(self.device)
                 for j in range(len(inputs)):
                     outputs[j] = self.model(inputs[j])
