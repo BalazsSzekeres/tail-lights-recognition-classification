@@ -20,7 +20,7 @@ from runner import Runner
 
 
 def read_img(data_list_element):
-    data_list_element.picture = read_image_to_tensor(data_list_element.location).to('cuda')
+    data_list_element.picture = read_image_to_tensor(data_list_element.location)
 
 
 def parse_args():
@@ -55,6 +55,11 @@ def main():
     data_loader = DataLoader(root_directory=args.data_root, difficulty=config["difficulty"])
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()
+
+    # data_list['data_class' == 'OOO']
+    key_val_list = ['OOO', 'BOO']
+    # data_list = list(filter(lambda d: d['data_class'] in key_val_list, data_list))
+    data_list = [d for d in data_list if d['data_class'] in key_val_list]
 
     train_sequences, test_sequences, data_list = data_processor.convert_to_train_test(data_list, config.get("n_train"),
                                                                                       config.get("n_test"),
