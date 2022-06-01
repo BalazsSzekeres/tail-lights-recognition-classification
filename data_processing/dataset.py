@@ -3,6 +3,7 @@ from typing import List, Dict
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from tqdm import tqdm
 
 from data_processing.frame_entry import FrameEntry
 
@@ -38,7 +39,7 @@ class SequenceDataSet:
             }
             for name, entry_list in sequences.items()
         ]
-        self.sequence_tuples = [tuple(seq.values()) for seq in self.sequences]
+        self.sequence_tuples = [tuple(seq.values()) for seq in tqdm(self.sequences)]
 
     def __len__(self):
         return len(self.sequence_tuples)
