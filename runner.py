@@ -148,7 +148,7 @@ class Runner:
 
             if self.config["early_stopping"] == True:
                 if test_acc > test_acc_best:
-                    test_acc_best = test_acc_best
+                    test_acc_best = test_acc
                     patience_cnt = 0
                 else:
                     patience_cnt += 1
