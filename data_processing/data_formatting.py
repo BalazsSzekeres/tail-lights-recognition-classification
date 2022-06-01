@@ -8,7 +8,7 @@ import torch as th
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-from data_processing.dataset import SequenceDataSet
+from data_processing.dataset import SequenceDataSet, CustomDataLoader
 from data_processing.frame_entry import FrameEntry
 
 classes = ['OOO', 'BOO', 'OLO', 'BLO', 'OOR', 'BOR', 'OLR', 'BLR']
@@ -88,11 +88,10 @@ class DataProcessor:
                 data_dict_list += frame_list
         return train_sequences, test_sequences, data_dict_list
 
-    def sequence_map_to_torch_loader(self, sequences, batch_size) -> th.utils.data.DataLoader:
+    def sequence_map_to_torch_loader(self, sequences, batch_size) -> CustomDataLoader:
         # 0 because we focus on brakes for now
         data_set = SequenceDataSet(sequences, 0)
-        data_loader = th.utils.data.DataLoader(data_set, batch_size=batch_size, collate_fn=data_set.collate_fn,
-                                               shuffle=True)
+        data_loader = CustomDataLoader(data_set, batch_size=batch_size)
         return data_loader
 
 
