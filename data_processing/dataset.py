@@ -53,9 +53,11 @@ class SequenceDataSet:
 
     def class_to_tensor(self, class_name):
         if class_name[self.letter_idx] == "O":
-            return torch.Tensor([1, 0])
+            # return torch.Tensor([1, 0])
+            return torch.Tensor([1])
         else:
-            return torch.Tensor([0, 1])
+            # return torch.Tensor([0, 1])
+            return torch.Tensor([0])
 
 
 class CustomDataLoader:
