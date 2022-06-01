@@ -2,7 +2,7 @@ wandb: True
 save_weights: True
 epochs: 50
 net: "net.yaml"
-learning_rate: 0.01
+learning_rate: 0.0001
 weight_decay: 0
 batch_size: 100
 difficulty: Easy

@@ -67,7 +67,7 @@ class Net(nn.Module):
             'lstm': nn.LSTM(input_size=self.config["lstm"]["in"], hidden_size=self.config["lstm"]["hidden"]),
             # 'lstm': LSTM(input_size=self.config["lstm"]["in"], hidden_size=self.config["lstm"]["hidden"]),
             'out': nn.Sequential(
-                nn.Linear(self.config["lstm"]["hidden"], 1)#self.config["output"]["size"]),
+                nn.Linear(self.config["lstm"]["hidden"], self.config["output"]["size"]),
                 # nn.Softmax(dim=1)
             )
         })
