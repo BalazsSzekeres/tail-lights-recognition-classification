@@ -55,8 +55,8 @@ def main():
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()
 
-    key_val_list = ['OOO', 'BOO']
-    data_list = [el for el in data_list if el.data_class in key_val_list]
+    # key_val_list = ['OOO', 'BOO']
+    # data_list = [el for el in data_list if el.data_class in key_val_list]
 
     train_sequences, test_sequences, data_list = data_processor.convert_to_train_test(data_list, config.get("n_train"),
                                                                                       config.get("n_test"),
