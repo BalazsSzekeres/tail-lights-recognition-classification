@@ -37,9 +37,9 @@ class SequenceDataSet:
                 "sequence": torch.stack([e.picture for e in entry_list]).to('cuda'),
                 "class": self.class_to_tensor(entry_list[0].data_class),
             }
-            for name, entry_list in sequences.items()
+            for name, entry_list in tqdm(sequences.items())
         ]
-        self.sequence_tuples = [tuple(seq.values()) for seq in tqdm(self.sequences)]
+        self.sequence_tuples = [tuple(seq.values()) for seq in self.sequences]
 
     def __len__(self):
         return len(self.sequence_tuples)
