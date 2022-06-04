@@ -104,7 +104,7 @@ class Runner:
         patience = self.config["patience"]
 
         # Initialize early stopping variables
-        test_acc_best = 0
+        val_acc_best = 0
         patience_cnt = 0
 
         for epoch in tqdm(range(self.config["epochs"])):
@@ -159,7 +159,7 @@ class Runner:
 
         # If early stopping, load best epoch
         if self.config["early_stopping"] == True:
-            checkpoint = torch.load(f'weights/weights_{best_epoch}', map_location=self.device)
+            checkpoint = torch.load(os.path.join('weights', f'weights_{best_epoch}.pt'), map_location=self.device)
             self.model.load_state_dict(checkpoint['model'])
 
         # Now run test

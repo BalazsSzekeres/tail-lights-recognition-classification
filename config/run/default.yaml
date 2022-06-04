@@ -1,10 +1,10 @@
 wandb: True
 save_weights: True
-epochs: 100
+epochs: 30
 net: "net.yaml"
 learning_rate: 0.0001
 weight_decay: 0.0001
-early_stopping: True
+early_stopping: False
 patience: 10
 batch_size: 100
 difficulty: Easy
@@ -12,6 +12,6 @@ difficulty: Easy
 # Commenting makes sure all data is used
 #n_train: 10
 #n_test: 2
-#max_sequence_size: 2
+max_sequence_size: 5
 # Percentage of train set used for validation
 val_ratio: 0.2
