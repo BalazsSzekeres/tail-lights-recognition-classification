@@ -17,8 +17,9 @@ import wandb
 
 
 class Runner:
-    def __init__(self, train_loader, test_loader, config, device):
+    def __init__(self, train_loader, val_loader, test_loader, config, device):
         self.train_loader = train_loader
+        self.val_loader = val_loader
         self.test_loader = test_loader
         self.config = config
         self.device = device
@@ -45,10 +46,8 @@ class Runner:
 
             # Move data to target device
             labels = labels.to(self.device)
-            # Trying out some different things for input
-            # inputs = [seq.to(self.device) for seq in inputs]
+
             outputs = torch.empty(len(inputs), 2).to(self.device)
-            # outputs = torch.empty(len(inputs), 1).to(self.device)
             for j in range(len(inputs)):
                 outputs[j] = self.model(inputs[j])
 
@@ -66,25 +65,25 @@ class Runner:
 
         return avg_loss / len(self.train_loader), 100 * correct / total
 
-    def test(self):
+    def test(self, val):
         avg_loss = 0
         correct = 0
         total = 0
 
+        # Select validation set or test set
+        data_loader = self.val_loader if val else self.test_loader
+
         # Use torch.no_grad to skip gradient calculation, not needed for evaluation
         with torch.no_grad():
             # Iterate through batches
-            for data in self.test_loader:
+            for data in data_loader:
                 # Get the inputs; data is a list of [inputs, labels]
                 inputs, labels = data
 
                 # Move data to target device
                 labels = labels.to(self.device)
-                # Trying out some different things for input
-                # inputs = inputs.to(self.device)
-                # inputs = [seq.to(self.device) for seq in inputs]
+
                 outputs = torch.empty(len(inputs), 2).to(self.device)
-                # outputs = torch.empty(len(inputs), 1).to(self.device)
                 for j in range(len(inputs)):
                     outputs[j] = self.model(inputs[j])
 
@@ -98,7 +97,7 @@ class Runner:
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-        return avg_loss / len(self.test_loader), 100 * correct / total
+        return avg_loss / len(data_loader), 100 * correct / total
 
     def run(self):
         # Patience - how many epochs to keep training after accuracy has not improved
@@ -111,8 +110,8 @@ class Runner:
         for epoch in tqdm(range(self.config["epochs"])):
             # Train on data
             train_loss, train_acc = self.train()
-            # Test on data
-            test_loss, test_acc = self.test()
+            # Val on data
+            val_loss, val_acc = self.test(val=True)
 
             # print(f"Epoch {epoch}:\n"
             #       f"\t{train_loss=}, {train_acc=}"
@@ -133,9 +132,9 @@ class Runner:
             model_type = self.config["net"][:-5]
 
             log_dict = {'Train_Loss_{}'.format(model_type): train_loss,
-                        'Test_Loss_{}'.format(model_type): test_loss,
+                        'Val_Loss_{}'.format(model_type): val_loss,
                         'Train_Accuracy_{}'.format(model_type): train_acc,
-                        'Test_Accuracy_{}'.format(model_type): test_acc}
+                        'Val_Accuracy_{}'.format(model_type): val_acc}
             print(log_dict)
             if self.config["wandb"]:
                 wandb.log(log_dict)
@@ -147,15 +146,31 @@ class Runner:
                 torch.save({'model': self.model.state_dict()}, os.path.join('weights', f'weights_{epoch}.pt'))
 
             if self.config["early_stopping"] == True:
-                if test_acc > test_acc_best:
-                    test_acc_best = test_acc
+                if val_acc > val_acc_best:
+                    val_acc_best = val_acc
                     patience_cnt = 0
                 else:
+                    if patience_cnt == 0:
+                        best_epoch = epoch
                     patience_cnt += 1
                     if patience_cnt == patience:
                         break
+        print('\nTraining Finished.')
 
-        print('\nFinished.')
+        # If early stopping, load best epoch
+        if self.config["early_stopping"] == True:
+            checkpoint = torch.load(f'weights/weights_{best_epoch}', map_location=self.device)
+            self.model.load_state_dict(checkpoint['model'])
+
+        # Now run test
+        test_loss, test_acc = self.test(val=False)
+        log_dict = {'Test_Loss_{}'.format(model_type): test_loss,
+                    'Test_Accuracy_{}'.format(model_type): test_acc}
+        print(log_dict)
+        if self.config["wandb"]:
+            wandb.log(log_dict)
+
+        print('\nTest Finished.')
         self.writer.flush()
         self.writer.close()
 

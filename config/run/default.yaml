@@ -10,6 +10,8 @@ batch_size: 100
 difficulty: Easy
 # These parameters allow training with a subset of sequences
 # Commenting makes sure all data is used
-#n_train: 20
+#n_train: 10
 #n_test: 2
-max_sequence_size: 5
+#max_sequence_size: 2
+# Percentage of train set used for validation
+val_ratio: 0.2

@@ -55,19 +55,23 @@ def main():
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()
 
-    # key_val_list = ['OOO', 'BOO']
-    # data_list = [el for el in data_list if el.data_class in key_val_list]
+    key_val_list = ['OOO', 'BOO']
+    data_list = [el for el in data_list if el.data_class in key_val_list]
 
-    train_sequences, test_sequences, data_list = data_processor.convert_to_train_test(data_list, config.get("n_train"),
-                                                                                      config.get("n_test"),
-                                                                                      max_sequence_size=config.get("max_sequence_size"))
+    train_sequences, val_sequences, test_sequences, data_list = data_processor.convert_to_train_test(
+        data_list,
+        config.get("n_train"),
+        config.get("n_test"),
+        config.get("val_ratio"),
+        max_sequence_size=config.get("max_sequence_size")
+    )
 
     data_list[:] = map(read_img, tqdm(data_list))
-
     train_loader = data_processor.sequence_map_to_torch_loader(train_sequences, config["batch_size"])
+    val_loader = data_processor.sequence_map_to_torch_loader(val_sequences, config["batch_size"])
     test_loader = data_processor.sequence_map_to_torch_loader(test_sequences, config["batch_size"])
 
-    runner = Runner(train_loader, test_loader, config, device)
+    runner = Runner(train_loader, val_loader, test_loader, config, device)
     runner.run()
     # run('lstm', train_loader, test_loader, save_weights)
 
