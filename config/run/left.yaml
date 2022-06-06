@@ -1,5 +1,5 @@
-wandb: False
-save_weights: False
+wandb: True
+save_weights: True
 epochs: 30
 net: "net.yaml"
 learning_rate: 0.0001
@@ -12,7 +12,7 @@ difficulty: Easy
 # Commenting makes sure all data is used
 n_train: 10
 n_test: 2
-max_sequence_size: 15
+max_sequence_size: 20
 # Percentage of train set used for validation
-val_ratio: 0.1
+val_ratio: 0.2
 letter_idx: 1 # Which letter to train i.e. brake, left or right turn signal
