@@ -12,8 +12,11 @@ from feature_extraction.FeatureExtractionROI import FeatureExtractionROI
 class SequenceDataSet:
     SequenceMap = Dict[str, List[FrameEntry]]
 
-    def __init__(self, sequences: SequenceMap, letter_idx):
-        self.letter_idx = letter_idx
+    def __init__(self, sequences: SequenceMap, config):
+        self.config = config
+        self.letter_idx = config["letter_idx"]
+        if self.letter_idx in [1, 2]:
+            self.feature_extraction_roi = FeatureExtractionROI(self.config)
         self.sequences = []
         # self.sequences = []
         # all_names = sequences.keys()
@@ -50,8 +53,7 @@ class SequenceDataSet:
             # Opencv2 : shape is H x W x C
             # Pytorch : shape is C x H X W
             picture_list = [(picture.numpy().transpose(1, 2, 0) * 255).astype('uint8') for picture in picture_list]
-            feature_extraction_roi = FeatureExtractionROI(self.letter_idx)
-            picture_list = feature_extraction_roi.extract_roi_sequence(picture_list)
+            picture_list = self.feature_extraction_roi.extract_roi_sequence(picture_list)
             picture_list = [(picture.transpose(2, 0, 1) / 255).astype(np.float32) for picture in picture_list]
             picture_list = [torch.from_numpy(picture) for picture in picture_list]
         return {

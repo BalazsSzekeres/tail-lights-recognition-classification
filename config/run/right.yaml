@@ -16,3 +16,5 @@ max_sequence_size: 20
 # Percentage of train set used for validation
 val_ratio: 0
 letter_idx: 2 # Which letter to train i.e. brake, left or right turn signal
+turn_signal:
+  take_difference: True

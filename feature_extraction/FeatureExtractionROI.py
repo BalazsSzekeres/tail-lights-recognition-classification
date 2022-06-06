@@ -9,10 +9,12 @@ from numpy.typing import NDArray
 class FeatureExtractionROI:
     """The FeatureExtractionROI class is used to extract the region of interests for the turn signal classifier."""
 
-    def __init__(self,  letter_idx, intended_img_size=227):
+    def __init__(self,  config, intended_img_size=227):
         self.intended_img_size = intended_img_size
         self.roi_block = round(self.intended_img_size / 5)
-        self.letter_idx = letter_idx
+        self.config = config
+        self.letter_idx = self.config["letter_idx"]
+        self.take_difference = self.config["turn_signal"]["take_difference"]
 
     def extract_roi_sequence(self, sequence: List[NDArray]) -> List[NDArray]:
         """Extract the region of interests features for a sequence"""
@@ -21,14 +23,18 @@ class FeatureExtractionROI:
         ]
 
         all_outputs = []
-        for i, j in zip(range(len(gray_images) - 1), range(1, len(gray_images))):
-            flow = self.calculate_flow(gray_images[i], gray_images[j])
+        if self.take_difference:
+            for i, j in zip(range(len(gray_images) - 1), range(1, len(gray_images))):
+                flow = self.calculate_flow(gray_images[i], gray_images[j])
 
-            warped_image = self.warp_image(sequence[i], flow)
-            difference_image = self.get_difference_image(warped_image, sequence[j])
+                warped_image = self.warp_image(sequence[i], flow)
+                difference_image = self.get_difference_image(warped_image, sequence[j])
 
-            output = self.get_region_of_interests(difference_image)
-            all_outputs.append(output)
+                output = self.get_region_of_interests(difference_image)
+                all_outputs.append(output)
+        else:
+            # Take region of interest only
+            all_outputs = [self.get_region_of_interests(image) for image in sequence]
         return all_outputs
 
     @staticmethod

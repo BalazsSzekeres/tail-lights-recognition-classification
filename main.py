@@ -70,8 +70,7 @@ def main():
 
     data_list[:] = map(read_img, tqdm(data_list))
     train_loader, val_loader, test_loader = \
-        data_processor.sequence_maps_to_torch_loaders([train_sequences, val_sequences, test_sequences],
-                                                      config["batch_size"], config["letter_idx"])
+        data_processor.sequence_maps_to_torch_loaders([train_sequences, val_sequences, test_sequences], config)
     runner = Runner(train_loader, val_loader, test_loader, config, device)
     runner.run()
     # run('lstm', train_loader, test_loader, save_weights)

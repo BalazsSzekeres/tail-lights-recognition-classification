@@ -96,12 +96,12 @@ class DataProcessor:
                 data_dict_list += frame_list
         return train_sequences, val_sequences, test_sequences, data_dict_list
 
-    def sequence_maps_to_torch_loaders(self, list_of_sequences, batch_size, letter_idx) -> List[CustomDataLoader]:
+    def sequence_maps_to_torch_loaders(self, list_of_sequences, config) -> List[CustomDataLoader]:
         # 0 because we focus on brakes for now
         data_loaders = []
         for sequences in list_of_sequences:
-            data_set = SequenceDataSet(sequences, letter_idx)
-            data_loader = CustomDataLoader(data_set, batch_size=batch_size)
+            data_set = SequenceDataSet(sequences, config)
+            data_loader = CustomDataLoader(data_set, batch_size=config["batch_size"])
             data_loaders.append(data_loader)
         return data_loaders
 
