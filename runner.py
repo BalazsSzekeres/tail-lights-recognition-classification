@@ -26,6 +26,8 @@ class Runner:
         self.writer = SummaryWriter()
         net_config = yaml.safe_load(open(os.path.join("config", "net", config["net"])).read())
         self.model = Net(net_config).to(self.device)
+        if torch.cuda.device_count() > 1:
+            self.model = nn.DataParallel(self.model)
         self.criterion = nn.CrossEntropyLoss()
         # self.criterion = nn.MSELoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=config["learning_rate"],
