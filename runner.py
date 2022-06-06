@@ -111,7 +111,8 @@ class Runner:
             # Train on data
             train_loss, train_acc = self.train()
             # Val on data
-            val_loss, val_acc = self.test(val=True)
+            use_val = self.config["val_ratio"] > 0
+            val_loss, val_acc = self.test(val=use_val)
 
             # print(f"Epoch {epoch}:\n"
             #       f"\t{train_loss=}, {train_acc=}"

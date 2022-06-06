@@ -10,9 +10,9 @@ batch_size: 100
 difficulty: Easy
 # These parameters allow training with a subset of sequences
 # Commenting makes sure all data is used
-n_train: 10
-n_test: 2
+#n_train: 10
+#n_test: 2
 max_sequence_size: 20
 # Percentage of train set used for validation
-val_ratio: 0.2
+val_ratio: 0
 letter_idx: 1 # Which letter to train i.e. brake, left or right turn signal

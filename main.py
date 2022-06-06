@@ -65,12 +65,13 @@ def main():
         config.get("val_ratio"),
         max_sequence_size=config.get("max_sequence_size")
     )
+    print(f"Using: \n\t{len(train_sequences)} train_sequences\n\t{len(val_sequences)} val_sequences"
+          f"\n\t{len(test_sequences)} test_sequences\n")
 
     data_list[:] = map(read_img, tqdm(data_list))
     train_loader, val_loader, test_loader = \
         data_processor.sequence_maps_to_torch_loaders([train_sequences, val_sequences, test_sequences],
                                                       config["batch_size"], config["letter_idx"])
-    del data_list
     runner = Runner(train_loader, val_loader, test_loader, config, device)
     runner.run()
     # run('lstm', train_loader, test_loader, save_weights)
