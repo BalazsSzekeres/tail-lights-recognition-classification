@@ -96,10 +96,12 @@ class DataProcessor:
                 data_dict_list += frame_list
         return train_sequences, val_sequences, test_sequences, data_dict_list
 
-    def sequence_map_to_torch_loader(self, sequences, batch_size) -> CustomDataLoader:
+    def sequence_map_to_torch_loader(self, sequences, batch_size) -> th.utils.data.DataLoader:
         # 0 because we focus on brakes for now
         data_set = SequenceDataSet(sequences, 0)
-        data_loader = CustomDataLoader(data_set, batch_size=batch_size)
+        # data_loader = CustomDataLoader(data_set, batch_size=batch_size)
+        data_loader = th.utils.data.DataLoader(data_set, batch_size=batch_size, collate_fn=data_set.collate_fn,
+                                               shuffle=True, pin_memory=True)
         return data_loader
 
 
