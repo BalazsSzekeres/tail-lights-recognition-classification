@@ -101,7 +101,7 @@ class DataProcessor:
         data_set = SequenceDataSet(sequences, 0)
         # data_loader = CustomDataLoader(data_set, batch_size=batch_size)
         data_loader = th.utils.data.DataLoader(data_set, batch_size=batch_size, collate_fn=data_set.collate_fn,
-                                               shuffle=True, pin_memory=True)
+                                               shuffle=True)
         return data_loader
 
 
