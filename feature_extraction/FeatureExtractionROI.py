@@ -9,18 +9,19 @@ from numpy.typing import NDArray
 class FeatureExtractionROI:
     """The FeatureExtractionROI class is used to extract the region of interests for the turn signal classifier."""
 
-    def __init__(self, intended_img_size=227):
+    def __init__(self,  letter_idx, intended_img_size=227):
         self.intended_img_size = intended_img_size
         self.roi_block = round(self.intended_img_size / 5)
+        self.letter_idx = letter_idx
 
-    def extract_roi_sequence(self, sequence: List[NDArray]) -> List[Tuple[NDArray, NDArray]]:
+    def extract_roi_sequence(self, sequence: List[NDArray]) -> List[NDArray]:
         """Extract the region of interests features for a sequence"""
         gray_images = [
             cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) for img in sequence
         ]
 
         all_outputs = []
-        for i, j in range(len(gray_images) - 1), range(1, len(gray_images)):
+        for i, j in zip(range(len(gray_images) - 1), range(1, len(gray_images))):
             flow = self.calculate_flow(gray_images[i], gray_images[j])
 
             warped_image = self.warp_image(sequence[i], flow)
@@ -43,14 +44,18 @@ class FeatureExtractionROI:
         flow[:, :, 1] += np.arange(h)[:, np.newaxis]
         return cv2.remap(src=image, map1=flow, map2=None, interpolation=cv2.INTER_LINEAR)
 
-    def get_region_of_interests(self, image) -> Tuple[NDArray, NDArray]:
+    def get_region_of_interests(self, image) -> NDArray:
         x_start = 0
         x_end = 2 * self.roi_block
         y_start = self.roi_block
         y_end = 3 * self.roi_block
-        left_roi = image[y_start:y_end, x_start:x_end]
-        right_roi = image[y_start:y_end, -x_end:]
-        return left_roi, right_roi
+        if self.letter_idx == 1:
+            left_roi = image[y_start:y_end, x_start:x_end]
+            roi = left_roi
+        else:
+            right_roi = image[y_start:y_end, -x_end:]
+            roi = right_roi
+        return cv2.resize(roi, (self.intended_img_size, self.intended_img_size))
 
     @staticmethod
     def get_difference_image(image_a: NDArray, image_b: NDArray) -> NDArray:

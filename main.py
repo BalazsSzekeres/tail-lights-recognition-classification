@@ -55,7 +55,7 @@ def main():
     data_processor = DataProcessor(data_loader.filtered_list)
     data_list = data_processor.get_frame_list()
 
-    key_val_list = ['OOO', 'BOO']
+    key_val_list = ['OOO', 'OLO']
     data_list = [el for el in data_list if el.data_class in key_val_list]
 
     train_sequences, val_sequences, test_sequences, data_list = data_processor.convert_to_train_test(
@@ -67,10 +67,10 @@ def main():
     )
 
     data_list[:] = map(read_img, tqdm(data_list))
-    train_loader = data_processor.sequence_map_to_torch_loader(train_sequences, config["batch_size"])
-    val_loader = data_processor.sequence_map_to_torch_loader(val_sequences, config["batch_size"])
-    test_loader = data_processor.sequence_map_to_torch_loader(test_sequences, config["batch_size"])
-
+    train_loader, val_loader, test_loader = \
+        data_processor.sequence_maps_to_torch_loaders([train_sequences, val_sequences, test_sequences],
+                                                      config["batch_size"], config["letter_idx"])
+    del data_list
     runner = Runner(train_loader, val_loader, test_loader, config, device)
     runner.run()
     # run('lstm', train_loader, test_loader, save_weights)

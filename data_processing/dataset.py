@@ -6,6 +6,7 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 
 from data_processing.frame_entry import FrameEntry
+from feature_extraction.FeatureExtractionROI import FeatureExtractionROI
 
 
 class SequenceDataSet:
@@ -32,11 +33,7 @@ class SequenceDataSet:
         #     })
 
         self.sequences = [
-            {
-                # "name": name,
-                "sequence": torch.stack([e.picture for e in entry_list]).to('cuda'),
-                "class": self.class_to_tensor(entry_list[0].data_class),
-            }
+            self.make_sequence([e.picture for e in entry_list], entry_list[0].data_class)
             for name, entry_list in tqdm(sequences.items())
         ]
         self.sequence_tuples = [tuple(seq.values()) for seq in self.sequences]
@@ -46,6 +43,22 @@ class SequenceDataSet:
 
     def __getitem__(self, idx):
         return self.sequence_tuples[idx]
+
+    def make_sequence(self, picture_list, class_name):
+        if self.letter_idx in [1, 2]:
+            # Apply feature extraction
+            # Opencv2 : shape is H x W x C
+            # Pytorch : shape is C x H X W
+            picture_list = [(picture.numpy().transpose(1, 2, 0) * 255).astype('uint8') for picture in picture_list]
+            feature_extraction_roi = FeatureExtractionROI(self.letter_idx)
+            picture_list = feature_extraction_roi.extract_roi_sequence(picture_list)
+            picture_list = [(picture.transpose(2, 0, 1) / 255).astype(np.float32) for picture in picture_list]
+            picture_list = [torch.from_numpy(picture) for picture in picture_list]
+        return {
+            # "name": name,
+            "sequence": torch.stack(picture_list).to('cuda'),
+            "class": self.class_to_tensor(class_name),
+        }
 
     @staticmethod
     def collate_fn(data):
