@@ -32,11 +32,11 @@ def parse_args():
 
 
 def main():
-    torch.cuda.empty_cache()
-    random.seed(123)
-    torch.manual_seed(123)
     args = parse_args()
     config = yaml.safe_load(open(args.config).read())
+    torch.cuda.empty_cache()
+    random.seed(config["random_seed"])
+    torch.manual_seed(config["random_seed"])
     #print(f"{config=}")
     if config["wandb"]:
         # Weights and biases
